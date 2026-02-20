@@ -1,0 +1,276 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0f1419;
+  /* Deep Natural Dark */
+  --foreground: #e8e6e3;
+  --accent: #c97d60;
+  /* Warm Terracotta */
+  --sidebar-bg: rgba(15, 20, 25, 0.85);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-accent: var(--accent);
+  --font-sans: var(--font-roboto);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-roboto), 'Courier New', Courier, monospace;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Noise Overlay */
+.noise-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+
+/* Liquid skill fill */
+.liquid-wrap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.liquid {
+  --level: 0;
+  position: absolute;
+  inset: 0;
+  transform: translateY(calc(100% - (var(--level) * 1%)));
+  will-change: transform;
+  transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.liquid-surface {
+  position: absolute;
+  top: -25px;
+  left: -30%;
+  width: 160%;
+  height: 100px;
+  z-index: 2;
+  pointer-events: none;
+  animation: liquid-surface-flow 6s ease-in-out infinite;
+  overflow: visible;
+}
+
+.liquid-wave-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: -50px;
+  background-repeat: repeat-x;
+  background-size: 200px 100px;
+  transform: translateZ(0);
+  will-change: background-position;
+}
+
+/* Base wave - provides the main color fill with gradient */
+.liquid-wave-base {
+  opacity: 0.85;
+  animation: liquid-wave-drift-slow 12s ease-in-out infinite;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100' preserveAspectRatio='none'%3E%3Cdefs%3E%3ClinearGradient id='waveGrad' x1='0%25' y1='0%25' x2='0%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='currentColor' stop-opacity='1'/%3E%3Cstop offset='100%25' stop-color='currentColor' stop-opacity='0.8'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M0 50 Q 25 40 50 50 T 100 50 T 150 50 T 200 50 L 200 100 L 0 100 Z' fill='url(%23waveGrad)'/%3E%3C/svg%3E");
+  background-size: 200px 100px;
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.98) 70%, rgba(0, 0, 0, 0.9) 85%, rgba(0, 0, 0, 0) 100%);
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.98) 70%, rgba(0, 0, 0, 0.9) 85%, rgba(0, 0, 0, 0) 100%);
+}
+
+/* Mid wave - adds depth */
+.liquid-wave-mid {
+  opacity: 0.5;
+  animation: liquid-wave-drift-medium 8s ease-in-out infinite reverse;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 40' preserveAspectRatio='none'%3E%3Cpath d='M0 25 Q 30 15 60 25 Q 90 35 120 25 Q 150 15 180 25 L 200 25 L 200 40 L 0 40 Z' fill='white' fill-opacity='0.6'/%3E%3C/svg%3E");
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.6) 50%, rgba(0, 0, 0, 0) 100%);
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.6) 50%, rgba(0, 0, 0, 0) 100%);
+  filter: blur(1px);
+}
+
+/* Top wave - highlights and shimmer */
+.liquid-wave-top {
+  opacity: 0.4;
+  animation: liquid-wave-drift-fast 6s ease-in-out infinite;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 40' preserveAspectRatio='none'%3E%3Cpath d='M0 15 Q 20 5 40 15 Q 60 25 80 15 Q 100 5 120 15 Q 140 25 160 15 Q 180 5 200 15 L 200 40 L 0 40 Z' fill='white' fill-opacity='0.9'/%3E%3C/svg%3E");
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.3) 40%, rgba(0, 0, 0, 0) 80%);
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.3) 40%, rgba(0, 0, 0, 0) 80%);
+  filter: blur(0.5px);
+}
+
+@keyframes liquid-wave-drift-slow {
+  0% { 
+    background-position-x: 0;
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+  100% { 
+    background-position-x: 200px;
+    transform: translateY(0);
+  }
+}
+
+@keyframes liquid-wave-drift-medium {
+  0% { 
+    background-position-x: 0;
+    transform: translateY(0) scaleY(1);
+  }
+  50% {
+    transform: translateY(-1px) scaleY(1.02);
+  }
+  100% { 
+    background-position-x: -200px;
+    transform: translateY(0) scaleY(1);
+  }
+}
+
+@keyframes liquid-wave-drift-fast {
+  0% { 
+    background-position-x: 0;
+    transform: translateY(0);
+  }
+  25% {
+    transform: translateY(-1px);
+  }
+  75% {
+    transform: translateY(1px);
+  }
+  100% { 
+    background-position-x: 200px;
+    transform: translateY(0);
+  }
+}
+
+@keyframes liquid-surface-flow {
+  0%, 100% { 
+    transform: translateY(0) scaleY(1);
+  }
+  25% {
+    transform: translateY(-3px) scaleY(1.01);
+  }
+  50% {
+    transform: translateY(-5px) scaleY(1.02);
+  }
+  75% {
+    transform: translateY(-2px) scaleY(1.01);
+  }
+}
+
+/* Responsive optimizations */
+@media (max-width: 640px) {
+  .liquid-surface {
+    height: 60px;
+    top: -15px;
+  }
+  
+  .liquid-wave-layer {
+    background-size: 160px 60px;
+  }
+  
+  @keyframes liquid-wave-drift-slow {
+    0% { 
+      background-position-x: 0;
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-1px);
+    }
+    100% { 
+      background-position-x: 160px;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes liquid-wave-drift-medium {
+    0% { 
+      background-position-x: 0;
+      transform: translateY(0) scaleY(1);
+    }
+    50% {
+      transform: translateY(-0.5px) scaleY(1.01);
+    }
+    100% { 
+      background-position-x: -160px;
+      transform: translateY(0) scaleY(1);
+    }
+  }
+  
+  @keyframes liquid-wave-drift-fast {
+    0% { 
+      background-position-x: 0;
+      transform: translateY(0);
+    }
+    25% {
+      transform: translateY(-0.5px);
+    }
+    75% {
+      transform: translateY(0.5px);
+    }
+    100% { 
+      background-position-x: 160px;
+      transform: translateY(0);
+    }
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  /* Improve touch interactions */
+  a, button {
+    -webkit-tap-highlight-color: rgba(34, 211, 238, 0.2);
+  }
+  
+  /* Ensure proper spacing for touch targets */
+  nav a {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+}
+
+
+
+
+/* Glassmorphism utility */
+.glass {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-sidebar {
+  background: rgba(3, 7, 18, 0.8);
+  backdrop-filter: blur(20px);
+  border-left: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #030712;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1f2937;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #374151;
+}
