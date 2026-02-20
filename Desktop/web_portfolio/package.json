@@ -25,4 +25,11 @@
     "tailwindcss": "^4",
     "typescript": "^5"
   }
+  "scripts": {
+  "dev": "next dev",
+  "build": "next build",
+  "vercel-build": "npm install --legacy-peer-deps && next build",
+  "start": "next start",
+  "lint": "eslint"
+}
 }
